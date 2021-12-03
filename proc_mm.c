@@ -9,7 +9,7 @@
 #define TAM_PART 1
 #define BASE 2
 #define TAM_PROC 3
-
+#define ARCHIVO "memory.bin"
 
 int idCounter = 0;
 int tree[2049][5];
@@ -17,8 +17,8 @@ int tree[2049][5];
 int alojar(int size, int nodo);
 int desalojar(int size, int nodo);
 void inicializarTree(int nodo, int size, int base);
-void cargarTree(FILE * f);
-void guardarTree(FILE * f);
+void cargarTree();
+void guardarTree();
 void mostrarTree();
 
 int main(int argc, char * argv []){
@@ -37,21 +37,23 @@ int main(int argc, char * argv []){
 
     //PREPARAR TODO
     int alojado;
-    FILE *f;
-    f = fopen("memory.bin", "r+");
+    FILE * f;
+    f = fopen(ARCHIVO, "r+");
     if(errno == EXISTE){
-        cargarTree(f);
+        fclose(f);
+        cargarTree();
     }
     else{
         //se crea el archivo
-        f = fopen("memory.bin", "w+");
+        f = fopen(ARCHIVO, "w+");
         //se inicia el grafo
         idCounter=1;
         inicializarTree(1, 1024, 0);
         //cargar el primer proceso;
         alojado = alojar(60, 1);
+        fclose(f);
     }
-
+   
     
     
     //CASOS
@@ -74,14 +76,12 @@ int main(int argc, char * argv []){
         }
     }
 
-    mostrarTree();
+    //mostrarTree();
 
 
 
+    guardarTree();
 
-
-    guardarTree(f);
-    fclose(f);
     return 0;
 }
 
@@ -146,24 +146,39 @@ void inicializarTree(int nodo, int size, int base){
     return;
 }
 
-void cargarTree(FILE * f){
+void cargarTree(){
+    FILE * f;
+    f = fopen(ARCHIVO, "r+");
+        if(f == NULL){
+        printf("Error de Carga\n");
+    }
     int i, j;
     fread(&idCounter, sizeof(int), 1, f);
-    for(i = 1; i<=2048; i+=1){
-        for(j = 0; j<4; j+=j){
+    for(i = 1; i<=2047; i+=1){
+        for(j = 0; j<4; j+=1){
             fread(&tree[i][j], sizeof(int), 1, f);
         }
     }
+    fclose(f);
+    return;
 }
 
-void guardarTree(FILE * f){
+void guardarTree(){
+    FILE * f;
+    f = fopen(ARCHIVO, "r+");
+    if(f == NULL){
+        printf("Error de Guardado\n");
+    }
     int i, j;
     fwrite(&idCounter, sizeof(int), 1, f);
-    for(i = 1; i<=2048; i+=1){
-        for(j = 0; j<4; j+=j){
+    for(i = 1; i<=2047; i+=1){
+        for(j = 0; j<4; j+=1){
             fwrite(&tree[i][j], sizeof(int), 1, f);
         }
     }
+    fflush(f);
+    fclose(f);
+    return;
 }
 void mostrarTree(){
     int i, j;
