@@ -4,15 +4,26 @@
 #include <unistd.h>
 #include <string.h>
 
+
 #define EXISTE 0  
 #define MID 0
 #define TAM_PART 1
 #define BASE 2
 #define TAM_PROC 3
 #define ARCHIVO "memory.bin"
+#define ORDEN_EJ3 0
+#define ORDEN_EJ4 1
+
+
 
 int idCounter = 0;
 int tree[2049][5];
+//tabla contiene
+//en columna 0 la direccion base
+//columna 1 el tamanho de particion
+//columna 2 el mid
+//columna 3 el indice del nodo al que hace referencia
+int tabla[2049][4];
 
 int alojar(int size, int nodo);
 int desalojar(int size, int nodo);
@@ -20,6 +31,11 @@ void inicializarTree(int nodo, int size, int base);
 void cargarTree();
 void guardarTree();
 void mostrarTree();
+void mostrarTabla();
+int crearTabla();
+void gotoxy(int x, int y);
+void ordenarTabla(int size);
+
 
 int main(int argc, char * argv []){
     //===============IDEA DE MODELADO
@@ -75,6 +91,13 @@ int main(int argc, char * argv []){
             printf("NO SE PUDO DESALOJAR PROCESO CON EL MID DADO.\n");
         }
     }
+    else if(strcmp(argv[1], "-m") == 0){
+        mostrarTabla(ORDEN_EJ3);
+    }
+    else if(strcmp(argv[1], "-M") == 0){
+        mostrarTabla(ORDEN_EJ4);
+    }
+
 
     //mostrarTree();
 
@@ -227,5 +250,93 @@ int desalojar(int mid, int nodo){
         tree[nodo][MID]=-1;
         tree[nodo][TAM_PROC]=0;
         return 0;
+    }
+}
+
+void mostrarTabla(int a){
+    int size = crearTabla();
+    ordenarTabla(size);
+    system("clear");
+    printf("DIRECCION BASE    |    TAMANHO    |     MID     |\n");
+    int y;
+    for(y=2; y<=size+1; y+=1){
+            gotoxy(0, y);
+            printf("%i", tabla[y-2][0]);
+            gotoxy(20, y);
+            printf("%i", tabla[y-2][1]);
+            gotoxy(36, y);
+            
+            if(a==ORDEN_EJ3){
+                if(tabla[y-2][2]==-1){
+                    printf("LIBRE");
+                }
+                else{
+                    printf("%i", tabla[y-2][2]);
+                }
+            }
+            if(a==ORDEN_EJ4){
+                if(tabla[y-2][2]==-1){
+                    printf("LIBRE");
+                }
+                else{
+                    printf("%i (FI: %i)", tabla[y-2][2], tree[tabla[y-2][3]][TAM_PART]-tree[tabla[y-2][3]][TAM_PROC]);
+                }
+            }
+
+    }
+    printf("\n"); 
+}
+
+int crearTabla(){
+    int i, j;
+    j=0;
+    for(i = 1; i<=2047; i+=1){
+        if(tree[i][MID]>0){
+            tabla[j][0]=tree[i][BASE];
+            tabla[j][1]=tree[i][TAM_PART];
+            tabla[j][2]=tree[i][MID];
+            tabla[j][3]=i;
+            j+=1;
+        }
+        if(tree[i][MID]==0 && tree[i*2][MID]==-1){
+            tabla[j][0]=tree[i*2][BASE];
+            tabla[j][1]=tree[i*2][TAM_PART];
+            tabla[j][2]=tree[i*2][MID];
+            tabla[j][3]=i*2;
+            j+=1;
+        }
+        if(tree[i][MID]==0 && tree[i*2+1][MID]==-1){
+            tabla[j][0]=tree[i*2+1][BASE];
+            tabla[j][1]=tree[i*2+1][TAM_PART];
+            tabla[j][2]=tree[i*2+1][MID];
+            tabla[j][3]=i*2+1;
+            j+=1;
+        }
+    }
+    return j;
+}
+
+void gotoxy(int x,int y)
+{
+    printf("%c[%d;%df",0x1B,y,x);
+}
+
+void ordenarTabla(int size){
+    //simple ordenamiento
+    int j, i, k; 
+    int aux[5];
+ 
+    for (i = 0; i < size; i+=1)
+    {
+        for (j = 0; j < size-1; j+=1){
+            if (tabla[j][0] > tabla[j+1][0]){
+                
+                for(k=0; k<4; k+=1) aux[k] = tabla[j][k];
+                for(k=0; k<4; k+=1) tabla[j][k] = tabla[j+1][k];
+                for(k=0; k<4; k+=1) tabla[j+1][k] = aux[k];
+            }
+            
+        }
+
     }
 }
