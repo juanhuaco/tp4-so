@@ -70,19 +70,31 @@ int main(int argc, char * argv []){
         fclose(f);
     }
    
-    
+    //interfaz
+    char option[3];
+    char input [10];
+    printf("\n");
+    printf("-n : <size> \n");
+    printf("-f : <MID> \n");
+    printf("-m : \n");
+    printf("-M : \n");
+    printf("Opcion: ");
+    scanf("%s", option);
+
     
     //CASOS
-    if(strcmp(argv[1], "-n") == 0){
-        int n = atoi(argv[2]);
+    if(strcmp(option,"-n")==0){
+        scanf("%s", input);
+        int n = atoi(input);
         alojado = alojar(n, 1);
         if(alojado == 0){
             printf("M E M O R Y A L L O C A T I O N – Process size: %i \n", n);
             printf("Resultado: Error catastrofico en la asignacion... No hay espacio \n");
         }
     }
-    else if(strcmp(argv[1], "-f") == 0){
-        int n = atoi(argv[2]);
+    else if(strcmp(option,"-f")==0){
+        scanf("%s", input);
+        int n = atoi(input);
         alojado = desalojar(n, 1);
         if(alojado==0){
             printf("M E M O R Y D E A L L O C A T I O N* Procces MID: %i\n", n);
@@ -91,10 +103,10 @@ int main(int argc, char * argv []){
             printf("NO SE PUDO DESALOJAR PROCESO CON EL MID DADO.\n");
         }
     }
-    else if(strcmp(argv[1], "-m") == 0){
+    else if(strcmp(option,"-m")==0){
         mostrarTabla(ORDEN_EJ3);
     }
-    else if(strcmp(argv[1], "-M") == 0){
+    else if(strcmp(option,"-M")==0){
         mostrarTabla(ORDEN_EJ4);
     }
 
